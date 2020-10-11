@@ -57,7 +57,7 @@ func (s ServiceImp) GetIPInfo(ip net.IP) (*IPData, error) {
 
 	//Fetch results
 	results, err := s.DB.Query(query)
-	if err != nil {
+	if err != nil || results == nil {
 		log.Printf(ERROR, err)
 		return nil, err
 	}
