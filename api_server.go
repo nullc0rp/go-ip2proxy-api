@@ -27,8 +27,13 @@ func main() {
 	//Get configuration
 	configuration := config.GetConfig()
 
+	//Define services
+	var serviceInstance service.Service
+	var controllerInstance controller.Controller
+	var databaseInstance database.Database
+
 	//Create database connection TODO: use env variables
-	databaseConnection := &database.Database{
+	databaseInstance = &database.DatabaseImpl{
 		Server:   configuration.DBHOST,
 		User:     configuration.DBUSERNAME,
 		Password: configuration.DBPASSWORD,
@@ -36,27 +41,27 @@ func main() {
 	}
 
 	//Start connection. If it fails, the server should not be operational
-	databaseConnection.Connect()
+	databaseInstance.Connect()
 
 	//Instance Service
-	service := &service.Service{
-		DB: databaseConnection,
+	serviceInstance = &service.ServiceImp{
+		DB: databaseInstance,
 	}
 
 	//Instance Controller
-	controller := &controller.Controller{
-		Service: service,
+	controllerInstance = &controller.ControllerImpl{
+		Service: serviceInstance,
 	}
 
 	//Create Server and Route Handlers
 	r := mux.NewRouter()
 
 	//Define paths
-	r.HandleFunc("/ip/{address:.*}", controller.GetIpInfo).Methods("GET")
-	r.HandleFunc("/country/{country:[A-Z]+}", controller.GetIpList).Methods("GET")
-	r.HandleFunc("/country/{country:[A-Z]+}/isp", controller.GetISPCountry).Methods("GET")
-	r.HandleFunc("/country/{country:[A-Z]+}/total", controller.GetIPTotalCountry).Methods("GET")
-	r.HandleFunc("/proxytypes", controller.GetMostProxyTypes).Methods("GET")
+	r.HandleFunc("/ip/{address:.*}", controllerInstance.GetIpInfo).Methods("GET")
+	r.HandleFunc("/country/{country:[A-Z]+}", controllerInstance.GetIpList).Methods("GET")
+	r.HandleFunc("/country/{country:[A-Z]+}/isp", controllerInstance.GetISPCountry).Methods("GET")
+	r.HandleFunc("/country/{country:[A-Z]+}/total", controllerInstance.GetIPTotalCountry).Methods("GET")
+	r.HandleFunc("/proxytypes", controllerInstance.GetMostProxyTypes).Methods("GET")
 
 	//Create http service TODO: use config variables
 	srv := &http.Server{

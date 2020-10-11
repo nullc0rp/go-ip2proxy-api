@@ -31,13 +31,22 @@ const (
 	UNKNOWN             = "Unknown error"
 )
 
-//Service handles requests and interacts with the DB
-type Service struct {
-	DB *database.Database
+//ServiceImp handles requests and interacts with the DB
+type ServiceImp struct {
+	DB database.Database
+}
+
+//Service interface
+type Service interface {
+	GetIPInfo(ip net.IP) (*IPData, error)
+	GetIPCountry(country string, limit int) (*IPCountryData, error)
+	GetISPCountry(country string) (*ISPCountryData, error)
+	GetCountryTotal(country string) (*IPCountryTotal, error)
+	MostProxyTypes() (*MostProxyTypeResult, error)
 }
 
 //GetIPInfo TODO:
-func (s Service) GetIPInfo(ip net.IP) (*IPData, error) {
+func (s ServiceImp) GetIPInfo(ip net.IP) (*IPData, error) {
 
 	//Get decimal ip value
 	decimalIP := IP2int(ip)
@@ -77,7 +86,7 @@ func (s Service) GetIPInfo(ip net.IP) (*IPData, error) {
 //To archive a query that returns the specified ammount of ip addresses we need to build a complex query or use Mysql variables to keep track of the given results
 //Since a complex query is needed, the performance of the query may be affected, and using Mysql variables is not a good practice
 //I've decided to go a simpler approach with limit. The results will be rendered in runtime and controlled before return. It exchanges performance for memory, which is acceptable in my opinion
-func (s Service) GetIPCountry(country string, limit int) (*IPCountryData, error) {
+func (s ServiceImp) GetIPCountry(country string, limit int) (*IPCountryData, error) {
 
 	//Build query
 	query := fmt.Sprintf(IPCOUNTRYQUERY, country, limit)
@@ -129,7 +138,7 @@ func (s Service) GetIPCountry(country string, limit int) (*IPCountryData, error)
 }
 
 //GetISPCountry Service to get all the ISP by country
-func (s Service) GetISPCountry(country string) (*ISPCountryData, error) {
+func (s ServiceImp) GetISPCountry(country string) (*ISPCountryData, error) {
 
 	//Build query
 	query := fmt.Sprintf(ISPCOUNTRYQUERY, country)
@@ -179,7 +188,7 @@ func (s Service) GetISPCountry(country string) (*ISPCountryData, error) {
 }
 
 //GetCountryTotal Get the total ammount of ips for a country
-func (s Service) GetCountryTotal(country string) (*IPCountryTotal, error) {
+func (s ServiceImp) GetCountryTotal(country string) (*IPCountryTotal, error) {
 
 	//Build query
 	query := fmt.Sprintf(IPCOUNTRYTOTALQUERY, country)
@@ -207,9 +216,9 @@ func (s Service) GetCountryTotal(country string) (*IPCountryTotal, error) {
 	return ipCountryTotal, nil
 }
 
-//MostProxyTypes Is the service that gets the most proxy types in the database
+//MostProxyTypes Is the ServiceImp that gets the most proxy types in the database
 //Note: The database has only one kind of proxy type in the whole table, so this always returns one result
-func (s Service) MostProxyTypes() (*MostProxyTypeResult, error) {
+func (s ServiceImp) MostProxyTypes() (*MostProxyTypeResult, error) {
 
 	//Prepare query
 	log.Print(MOSTPROXYTYPES)

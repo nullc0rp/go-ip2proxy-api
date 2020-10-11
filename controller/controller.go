@@ -12,8 +12,17 @@ import (
 )
 
 //Controller handles requests and filter common requests
-type Controller struct {
-	Service *service.Service
+type ControllerImpl struct {
+	Service service.Service
+}
+
+//Controller interface
+type Controller interface {
+	GetIpInfo(w http.ResponseWriter, r *http.Request)
+	GetIpList(w http.ResponseWriter, r *http.Request)
+	GetISPCountry(w http.ResponseWriter, r *http.Request)
+	GetIPTotalCountry(w http.ResponseWriter, r *http.Request)
+	GetMostProxyTypes(w http.ResponseWriter, r *http.Request)
 }
 
 const (
@@ -31,7 +40,7 @@ const (
 )
 
 //GetIpInfo is the controller for IP Information endpoint
-func (c Controller) GetIpInfo(w http.ResponseWriter, r *http.Request) {
+func (c ControllerImpl) GetIpInfo(w http.ResponseWriter, r *http.Request) {
 
 	// Get path vars
 	vars := mux.Vars(r)
@@ -67,7 +76,7 @@ func (c Controller) GetIpInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetIpList is the controller to ammount of addresses determined by limit parameter or 50 by default.
-func (c Controller) GetIpList(w http.ResponseWriter, r *http.Request) {
+func (c ControllerImpl) GetIpList(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -110,7 +119,7 @@ func (c Controller) GetIpList(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetISPCountry is the controller to get all the ISP by country
-func (c Controller) GetISPCountry(w http.ResponseWriter, r *http.Request) {
+func (c ControllerImpl) GetISPCountry(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -142,7 +151,7 @@ func (c Controller) GetISPCountry(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetIPTotalCountry is the controller to get the IP count for a country
-func (c Controller) GetIPTotalCountry(w http.ResponseWriter, r *http.Request) {
+func (c ControllerImpl) GetIPTotalCountry(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 
@@ -174,7 +183,7 @@ func (c Controller) GetIPTotalCountry(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetMostProxyTypes is the controller to get the top 3 most proxy types
-func (c Controller) GetMostProxyTypes(w http.ResponseWriter, r *http.Request) {
+func (c ControllerImpl) GetMostProxyTypes(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Received request for most proxy types")
 

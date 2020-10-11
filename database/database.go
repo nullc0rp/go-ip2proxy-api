@@ -9,8 +9,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+//Database interface
+type Database interface {
+	Connect()
+	Disconnect()
+	Query(query string) (*sql.Rows, error)
+}
+
 // Database connection "manager" main struct, holds the connection globally
-type Database struct {
+type DatabaseImpl struct {
 	connection *sql.DB
 	Server     string
 	User       string
@@ -23,7 +30,7 @@ const (
 )
 
 // Connect connects to database
-func (c *Database) Connect() {
+func (c *DatabaseImpl) Connect() {
 	var err error
 
 	// Start database connection
@@ -46,12 +53,12 @@ func (c *Database) Connect() {
 }
 
 // Disconnect from the database
-func (c Database) Disconnect() {
+func (c DatabaseImpl) Disconnect() {
 	c.connection.Close()
 }
 
 // Query launches a query against the database
-func (c Database) Query(query string) (*sql.Rows, error) {
+func (c DatabaseImpl) Query(query string) (*sql.Rows, error) {
 	// Prepare statement for reading data
 	results, err := c.connection.Query(query)
 	if err != nil {
@@ -62,8 +69,8 @@ func (c Database) Query(query string) (*sql.Rows, error) {
 }
 
 //New Creates a new database
-func (c Database) New(server string, user string, password string, database string) *Database {
-	return &Database{
+func (c DatabaseImpl) New(server string, user string, password string, database string) *DatabaseImpl {
+	return &DatabaseImpl{
 		Server:   server,
 		User:     user,
 		Password: password,
