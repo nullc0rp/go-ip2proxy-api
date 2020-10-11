@@ -1,0 +1,7 @@
+{
+    "DBUSERNAME": "admin",
+    "DBPASSWORD": "<use_your_own>",
+    "DBPORT": "3306",
+    "DBHOST": "ip2proxy-db",
+    "DBNAME": "ip2proxy_database"
+}
